@@ -1,0 +1,10 @@
+# Packages installed on production machines
+
+# Only for testing
+-r /Users/zu/p/philab/phi/requirements.txt
+-r /Users/zu/p/philab/phidata/requirements.txt
+
+pandas
+pydantic
+# To work with airflow
+sqlalchemy==1.3.24

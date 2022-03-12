@@ -1,0 +1,5 @@
+apache-airflow==2.1.3 \
+    --hash=sha256:bd78ffe1ffbe5b13f5dfee286cc7dc93254bb18b4e91175e0b7cbae1cdfce800
+apache-airflow-providers-postgres==2.3.0 \
+    --hash=sha256:c67a307e6a2d9289222721a8a6eba64acd626ffc450cc887b261cf85cbc346b3
+psycopg2-binary>=2.7.4

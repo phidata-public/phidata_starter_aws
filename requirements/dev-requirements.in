@@ -1,0 +1,5 @@
+# Packages installed on dev machines
+
+-r prd-requirements.txt
+black
+mypy
