@@ -9,8 +9,8 @@
 #
 ############################################################################
 
-CURR_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT_DIR="$( dirname $CURR_SCRIPT_DIR )"
+CURR_SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+ROOT_DIR="$( dirname $CURR_SCRIPT_PATH )"
 REQUIREMENTS_DIR=$ROOT_DIR/requirements
 
 print_horizontal_line() {
@@ -18,6 +18,7 @@ print_horizontal_line() {
 }
 
 print_heading() {
+  print_horizontal_line
   echo "--*--> $1"
   print_horizontal_line
 }
@@ -51,6 +52,7 @@ main() {
     UPDATE=1
   fi
 
+  print_heading "Installing workspace: ${ROOT_DIR}"
   print_heading "Installing pip-tools"
   python -m pip install pip-tools
 
