@@ -1,16 +1,10 @@
-from phidata.app.airflow import Airflow
-from phidata.app.databox import Databox
-from phidata.app.jupyter import Jupyter
 from phidata.app.devbox import Devbox, DevboxDevModeArgs
 from phidata.app.postgres import PostgresDb
 from phidata.infra.aws.config import AwsConfig
-from phidata.infra.aws.resource.cloudformation import CloudFormationStack
-from phidata.infra.aws.resource.eks.cluster import EksCluster
-from phidata.infra.aws.resource.eks.node_group import EksNodeGroup
+from phidata.infra.aws.create.iam.role import create_glue_iam_role
 from phidata.infra.aws.resource.group import AwsResourceGroup
 from phidata.infra.aws.resource.s3 import S3Bucket
 from phidata.infra.docker.config import DockerConfig
-from phidata.infra.k8s.config import K8sConfig
 from phidata.workspace import WorkspaceConfig
 
 # Workspace name
@@ -30,22 +24,15 @@ dev_pg = PostgresDb(
     container_host_port=5532,
     postgres_user="dev",
     postgres_db="dev",
-    # TODO: update to read from a secrets file
     postgres_password="dev",
 )
 dev_pg_conn_id = "dev_pg"
 devbox = Devbox(
-    # Mount Aws config on the container
+    # Mount Aws config from on the container, will be used for interacting with aws resouces
     mount_aws_config=True,
     # Init Airflow webserver when the container starts
     init_airflow_webserver=True,
-    # Init Airflow scheduler as a deamon process
-    # init_airflow_scheduler=True,
-    # Creates a link between the airflow_dir and airflow_home on the container
-    # Useful when debugging the airflow conf
-    link_airflow_home=True,
-    # use_cache=False implies the container will be
-    # recreated every time you run `phi ws up`
+    # use_cache=False will recreate the container every time we run `phi ws up`
     use_cache=False,
     dev_mode=DevboxDevModeArgs(),
     db_connections={dev_pg_conn_id: dev_pg.get_connection_url_docker()},
@@ -66,33 +53,17 @@ dev_docker_config = DockerConfig(
 # s3 bucket for storing data
 # TODO: prefix the bucket name with your team name and make it globally unique
 data_s3_bucket = S3Bucket(
-    name=f"{ws_name}-warehouse",
+    name=f"phi-starter-aws-{ws_name}-warehouse",
     acl="private",
 )
-data_vpc_stack = CloudFormationStack(
-    name=f"{ws_name}-vpc",
-    template_url="https://amazon-eks.s3.us-west-2.amazonaws.com/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml",
-    ## uncomment when workspace is production-ready
-    ## skip_delete=True implies this resource will NOT be deleted with `phi ws down`
-    # skip_delete=True,
+glue_iam_role = create_glue_iam_role(
+    name=f"{ws_name}-glue-crawler-role",
+    s3_buckets=[data_s3_bucket],
 )
-data_eks_cluster = EksCluster(
-    name=f"{ws_name}-cluster",
-    vpc_stack=data_vpc_stack,
-    # skip_delete=True,
-)
-data_eks_nodegroup = EksNodeGroup(
-    name=f"{ws_name}-ng",
-    eks_cluster=data_eks_cluster,
-    min_size=2,
-    max_size=5,
-    # skip_delete=True,
-)
+
 aws_resources = AwsResourceGroup(
     s3_buckets=[data_s3_bucket],
-    cloudformation_stacks=[data_vpc_stack],
-    eks_cluster=data_eks_cluster,
-    eks_nodegroups=[data_eks_nodegroup],
+    iam_roles=[glue_iam_role],
 )
 prd_aws_config = AwsConfig(
     env="prd",
@@ -100,44 +71,15 @@ prd_aws_config = AwsConfig(
 )
 
 ######################################################
-## Applications running on EKS Cluster
-##  - Postgres Database: For storing prod data
-##  - Databox: A containerized environment for testing prod workflows before merging.
-##  - Airflow: For orchestrating prod workflows
-##  - Jupyter: For analyzing prod data
-######################################################
-
-prd_pg_name = "prd-pg"
-# The password is created on K8s as a Secret, it needs to be in base64
-# echo "prd" | base64
-prd_pg_password = "cHJkCg=="
-prd_pg = PostgresDb(
-    name=prd_pg_name,
-    postgres_user="prd",
-    postgres_db="prd",
-    # TODO: update to read from a secrets file
-    postgres_password=prd_pg_password,
-)
-databox = Databox()
-airflow = Airflow(enabled=False)
-jupyter = Jupyter(enabled=False)
-
-prd_k8s_config = K8sConfig(
-    env="prd",
-    apps=[prd_pg, databox, airflow, jupyter],
-    eks_cluster=data_eks_cluster,
-)
-
-######################################################
 ## Configure the workspace
 ######################################################
 workspace = WorkspaceConfig(
-    # the workspace name should match the folder containing
+    # name should match the folder containing
     # the products and workspace directories. default: data
-    # this should also match the name in setup.py
+    # this should also match the module name in setup.py
     name=ws_name,
-    default_env="dev",
+    # default_env="dev",
     docker=[dev_docker_config],
-    k8s=[prd_k8s_config],
     aws=[prd_aws_config],
+    # aws_region="us-east-1",
 )
