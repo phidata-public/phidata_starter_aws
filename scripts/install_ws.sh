@@ -4,8 +4,8 @@
 #
 # Install python dependencies
 # Usage:
-#   ./scripts/install_workspace.sh    : Install dev dependencies
-#   ./scripts/install_workspace.sh -u : Upgrade + Install dev dependencies
+#   ./scripts/install_ws.sh    : Install dev dependencies
+#   ./scripts/install_ws.sh -u : Upgrade + Install dev dependencies
 #
 ############################################################################
 
@@ -33,11 +33,11 @@ install_python_deps() {
 
 update_python_deps() {
   print_heading "Compiling production requirements"
-  CUSTOM_COMPILE_COMMAND="./scripts/install_workspace.sh -u" \
+  CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
     pip-compile --generate-hashes ${REQUIREMENTS_DIR}/prd-requirements.in
 
   print_heading "Compiling dev requirements"
-  CUSTOM_COMPILE_COMMAND="./scripts/install_workspace.sh -u" \
+  CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
     pip-compile --generate-hashes ${REQUIREMENTS_DIR}/dev-requirements.in
 }
 
