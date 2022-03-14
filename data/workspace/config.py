@@ -33,6 +33,7 @@ dev_pg = PostgresDb(
     # TODO: update to read from a secrets file
     postgres_password="dev",
 )
+dev_pg_conn_id = "dev_pg"
 devbox = Devbox(
     # Mount Aws config on the container
     mount_aws_config=True,
@@ -47,7 +48,7 @@ devbox = Devbox(
     # recreated every time you run `phi ws up`
     use_cache=False,
     dev_mode=DevboxDevModeArgs(),
-    db_connections={"dev_pg": dev_pg.get_connection_url_docker()},
+    db_connections={dev_pg_conn_id: dev_pg.get_connection_url_docker()},
     create_airflow_test_user=True,
 )
 dev_docker_config = DockerConfig(
@@ -63,7 +64,7 @@ dev_docker_config = DockerConfig(
 ######################################################
 
 # s3 bucket for storing data
-# TODO: please prefix the bucket name with your team name to make it globally unique
+# TODO: prefix the bucket name with your team name and make it globally unique
 data_s3_bucket = S3Bucket(
     name=f"{ws_name}-warehouse",
     acl="private",
@@ -131,6 +132,9 @@ prd_k8s_config = K8sConfig(
 ## Configure the workspace
 ######################################################
 workspace = WorkspaceConfig(
+    # the workspace name should match the folder containing
+    # the products and workspace directories. default: data
+    # this should also match the name in setup.py
     name=ws_name,
     default_env="dev",
     docker=[dev_docker_config],

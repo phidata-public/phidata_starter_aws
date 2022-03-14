@@ -34,11 +34,11 @@ install_python_deps() {
 update_python_deps() {
   print_heading "Compiling production requirements"
   CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
-    pip-compile --generate-hashes ${REQUIREMENTS_DIR}/prd-requirements.in
+    pip-compile --upgrade --generate-hashes ${REQUIREMENTS_DIR}/prd-requirements.in
 
   print_heading "Compiling dev requirements"
   CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
-    pip-compile --generate-hashes ${REQUIREMENTS_DIR}/dev-requirements.in
+    pip-compile --upgrade --generate-hashes ${REQUIREMENTS_DIR}/dev-requirements.in
 }
 
 install_workspace() {
