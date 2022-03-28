@@ -4,14 +4,12 @@
 #
 # Install python dependencies
 # Usage:
-#   ./scripts/install_ws.sh    : Install dev dependencies
-#   ./scripts/install_ws.sh -u : Upgrade + Install dev dependencies
+#   ./scripts/install.sh    : Install dependencies
+#   ./scripts/install.sh -u : Upgrade + Install dependencies
 #
 ############################################################################
-
-CURR_SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-ROOT_DIR="$( dirname $CURR_SCRIPT_PATH )"
-REQUIREMENTS_DIR=$ROOT_DIR/requirements
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$( dirname $SCRIPTS_DIR )"
 
 print_horizontal_line() {
   echo "------------------------------------------------------------"
@@ -24,21 +22,18 @@ print_heading() {
 }
 
 install_python_deps() {
-  print_heading "Installing dev requirements"
-  pip install -r $REQUIREMENTS_DIR/dev-requirements.txt --no-deps
+  print_heading "Installing dependencies"
+  pip install -r $ROOT_DIR/requirements.txt --no-deps
 
   print_heading "Installing airflow dependencies for code completion"
-  pip install -r $REQUIREMENTS_DIR/airflow-requirements.txt --no-deps
+  pip install -r $ROOT_DIR/airflow-requirements.txt --no-deps
 }
 
 update_python_deps() {
-  print_heading "Compiling production requirements"
-  CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
-    pip-compile --upgrade ${REQUIREMENTS_DIR}/prd-requirements.in
-
-  print_heading "Compiling dev requirements"
-  CUSTOM_COMPILE_COMMAND="./scripts/install_ws.sh -u" \
-    pip-compile --upgrade ${REQUIREMENTS_DIR}/dev-requirements.in
+  print_heading "Compiling requirements"
+  cd $ROOT_DIR
+  CUSTOM_COMPILE_COMMAND="./scripts/install.sh -u" \
+    pip-compile --upgrade --pip-args "--no-cache-dir"
 }
 
 install_workspace() {

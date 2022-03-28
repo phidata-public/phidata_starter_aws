@@ -4,12 +4,12 @@
 #
 # Format workspace using black and mypy
 # Usage:
-#   ./scripts/format_ws.sh
+#   ./scripts/format.sh
 #
 ############################################################################
 
-CURR_SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-ROOT_DIR="$( dirname $CURR_SCRIPT_PATH )"
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$( dirname $SCRIPTS_DIR )"
 DATA_DIR=$ROOT_DIR/data
 
 print_horizontal_line() {
@@ -25,9 +25,8 @@ print_heading() {
 main() {
   print_heading "Running: black $DATA_DIR"
   black $DATA_DIR
-  # currently skipped
-  # print_heading "Running: mypy $DATA_DIR"
-  # mypy $DATA_DIR
+  print_heading "Running: mypy $DATA_DIR --config-file $ROOT_DIR/pyproject.toml"
+  mypy $DATA_DIR --config-file $ROOT_DIR/pyproject.toml
 }
 
 main "$@"
