@@ -1,5 +1,6 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
+# ignore storage dir
 storage
 
 .DS_Store
@@ -10,8 +11,6 @@ env
 __pycache__
 *.egg-info
 *.pyc
-
-cloud_sql_proxy
 
 # Machine specific
 .venv

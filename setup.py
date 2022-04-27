@@ -1,19 +1,5 @@
-from setuptools import find_packages, setup
+# A minimal setup.py file for supporting editable installs
 
-version = "0.1.0"
+from setuptools import setup
 
-setup(
-    name="data",
-    version=version,
-    author="Data Team",
-    author_email="data@team.com",
-    packages=find_packages(),
-    python_requires=">=3.7",
-    install_requires=[
-        "matplotlib",
-        "pandas",
-        "phidata",
-        "psycopg2-binary",
-        "sqlalchemy",
-    ],
-)
+setup()
