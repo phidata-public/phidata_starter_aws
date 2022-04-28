@@ -50,6 +50,7 @@ prd_aws_config = AwsConfig(
 
 # -*- Define the WorkspaceConfig
 workspace = WorkspaceConfig(
+    default_env="dev",
     docker=[dev_docker_config],
     aws=[prd_aws_config],
 )
