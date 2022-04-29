@@ -68,9 +68,9 @@ oauthlib==3.2.0
     # via requests-oauthlib
 pandas==1.4.2
     # via data
-phidata==0.1.39
+phidata==0.1.40
     # via data
-phiterm==0.1.39
+phiterm==0.1.40
     # via phidata
 psycopg2-binary==2.9.3
     # via data
